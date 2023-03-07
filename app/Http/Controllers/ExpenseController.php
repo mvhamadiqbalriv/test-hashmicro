@@ -57,9 +57,12 @@ class ExpenseController extends Controller
                 'data' => $validator->errors()
             ], 400);
         }
+        
+        if ($request->category_id) {
+            $categories = explode(',', $request->category_id);
+        }
 
         $data = new Expense([
-            'category_id' => $request->category_id,
             'item' => $request->item,
             'price' => $request->price,
             'quantity' => $request->quantity,
@@ -68,6 +71,9 @@ class ExpenseController extends Controller
         ]);
 
         if($data->save()){
+            if ($request->category_id) {
+                $data->categories()->sync($categories);
+            }
             return response()->json([
                 'status' => true,
                 'data' => $data
@@ -87,9 +93,10 @@ class ExpenseController extends Controller
      */
     public function detail($id)
     {
-        $expense = Expense::find($id);
+        $expense = Expense::with('categories')->find($id);
 
         if($expense){
+            $expense->categoriesSelected = $expense->categories->pluck('id')->toArray();
             return response()->json([
                 'status' => true,
                 'data' => $expense
@@ -139,7 +146,10 @@ class ExpenseController extends Controller
 
         $data = Expense::find($request->id);
 
-        $data->category_id = $request->category_id ?: $data->category_id;
+        if ($request->category_id) {
+            $categories = explode(',', $request->category_id);
+        }
+
         $data->item = $request->item ?: $data->item;
         $data->price = $request->price ?: $data->price;
         $data->quantity = $request->quantity ?: $data->quantity;
@@ -147,6 +157,9 @@ class ExpenseController extends Controller
         $data->description = $request->description ?: $data->description;
 
         if($data->save()){
+            if ($request->category_id) {
+                $data->categories()->sync($categories);
+            }
             return response()->json([
                 'status' => true,
                 'data' => $data
@@ -166,7 +179,7 @@ class ExpenseController extends Controller
      */
     public function delete($id)
     {
-        $data = ExpenseCategory::find($id);
+        $data = Expense::find($id);
 
         if($data->delete()){
             return response()->json([

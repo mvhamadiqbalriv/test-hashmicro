@@ -11,7 +11,8 @@ class Expense extends Model
 
     protected $guarded = ['id'];
 
-    public function category(){
-        return $this->belongsTo(ExpenseCategory::class, 'category_id');
+    public function categories(){
+        return $this->belongsToMany(ExpenseCategory::class, 'expense_has_categories', 'expense_id', 'category_id')
+                ->withTimestamps();
     }
 }

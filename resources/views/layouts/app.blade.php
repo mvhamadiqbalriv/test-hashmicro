@@ -19,6 +19,7 @@
   <link href="{{asset('/')}}assets/css/nucleo-svg.css" rel="stylesheet" />
   <!-- CSS Files -->
   <link id="pagestyle" href="{{asset('/')}}assets/css/argon-dashboard.css?v=2.0.4" rel="stylesheet" />
+  @yield('head')
 </head>
 
 <body class="g-sidenav-show   bg-gray-100">
@@ -157,6 +158,7 @@
   <script async defer src="https://buttons.github.io/buttons.js"></script>
   <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="{{asset('/')}}assets/js/argon-dashboard.min.js?v=2.0.4"></script>
+  @yield('body')
 </body>
 
 </html>

@@ -1,5 +1,15 @@
 @extends('layouts.app')
 
+@section('head')
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <style>
+    .select2{
+      width: 100px;
+      font-size: 15px;
+    }
+  </style>
+@endsection
+
 @section('content')
 <div class="row">
     <div class="col-12">
@@ -34,7 +44,7 @@
                 @forelse ($expense as $item)
                 <tr>
                     <td class=" text-center">
-                      <span class="text-secondary text-xs font-weight-bold">{{$item->category->name}}</span>
+                      <span class="text-secondary text-xs font-weight-bold">{{$item->categories ? implode(', ', $item->categories->pluck('name')->toArray()) : '-'}}</span>
                     </td>
                     <td class=" text-center">
                       <span class="text-secondary text-xs font-weight-bold">{{$item->description ?: '-'}}</span>
@@ -87,7 +97,7 @@
               <div class="modal-body">
                 <div class="form-group">
                   <label for="">Category <sup class="text-danger">*</sup> </label>
-                  <select name="category_id" class="form-select" id="category_id_create">
+                  <select name="category_id[]" multiple="multiple" class="form-select select2" id="category_id_create">
                     @foreach ($categories as $item)
                         <option value="{{$item->id}}">{{$item->name}}</option>
                     @endforeach
@@ -139,7 +149,7 @@
               <div class="modal-body">
                 <div class="form-group">
                   <label for="">Category <sup class="text-danger">*</sup> </label>
-                  <select name="category_id" class="form-select" id="category_id_edit">
+                  <select name="category_id[]" multiple="multiple" class="form-select select2" id="category_id_edit">
                     @foreach ($categories as $item)
                         <option value="{{$item->id}}">{{$item->name}}</option>
                     @endforeach
@@ -181,199 +191,221 @@
       </div>
     </div>
   </div>
+@endsection
+@section('body')
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js" integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
-    function hideValidation() {
-        const validation = document.querySelectorAll(`[id$="_validation"]`)
-        for(var i = 0; i < validation.length; i++){
-            
-            validation[i].style.display = "none";
-        }
-    }
+<script>
+  function hideValidation() {
+      const validation = document.querySelectorAll(`[id$="_validation"]`)
+      for(var i = 0; i < validation.length; i++){
+          
+          validation[i].style.display = "none";
+      }
+  }
 
-    let create = document.getElementById('create');
+  let create = document.getElementById('create');
 
-    create.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        let category_id = create.category_id.value ?? '';
-        let item = create.item.value ?? '';
-        let price = create.price.value ?? '';
-        let quantity = create.quantity.value ?? '';
-        let amount = create.amount.value ?? '';
-        let description = create.description.value ?? '';
-
-        let formData = new FormData();
-        formData.append('category_id', category_id);
-        formData.append('item', item);
-        formData.append('price', price);
-        formData.append('quantity', quantity);
-        formData.append('amount', amount);
-        formData.append('description', description);
-
-        fetch("{{route('expenses.store')}}", {
-            method: "POST",
-            body: formData,
-            headers: {
-                "X-CSRF-TOKEN": "{{csrf_token()}}"
-            }
-        })
-        .then(response => response.json())
-        .then(resp => {
-            if (resp.status == true) {
-              Swal.fire(
-                'Good job!',
-                'Expense Created!',
-                'success'
-              )
-              setInterval(() => {
-                location.reload(true)
-              }, 1000);
-            }else{
-                if (resp.data) {
-                    var error = Object.entries(resp.data);
-                    hideValidation()
-                    error.forEach((key,value) => {
-                        document.getElementById(key[0]+'_create_validation').style.display = 'block';
-                        document.getElementById(key[0]+'_create_validation').textContent = key[1];
-                    });
-                }
-            }
-        })
-
-    })
-    
-    function editModal(id){
-      var myModal = new bootstrap.Modal(document.getElementById("editModal"), {});
+  create.addEventListener('submit', (e) => {
+      e.preventDefault();
       
-      fetch("{{url('expenses')}}/"+id)
-      .then(response => response.json())
-      .then(function (resp) {
-        if (resp.status == true) {
+      var categoryOptions = $('#category_id_create').select2('data');
+      var categoryValues = [];
+      for (var i = 0; i < categoryOptions.length; i++) {
+        categoryValues.push(categoryOptions[i].id);
+      }
 
-            document.getElementById('id_edit').value = id;
-            document.getElementById('category_id_edit').value = resp.data.category_id;
-            document.getElementById('description_edit').value = resp.data.description;
-            document.getElementById('item_edit').value = resp.data.item;
-            document.getElementById('price_edit').value = resp.data.price;
-            document.getElementById('quantity_edit').value = resp.data.quantity;
-            document.getElementById('amount_edit').value = resp.data.amount;
+      let item = create.item.value ?? '';
+      let price = create.price.value ?? '';
+      let quantity = create.quantity.value ?? '';
+      let amount = create.amount.value ?? '';
+      let description = create.description.value ?? '';
 
-            myModal.show();
-        } 
+      let formData = new FormData();
+      formData.append('category_id', categoryValues);
+      formData.append('item', item);
+      formData.append('price', price);
+      formData.append('quantity', quantity);
+      formData.append('amount', amount);
+      formData.append('description', description);
+
+      fetch("{{route('expenses.store')}}", {
+          method: "POST",
+          body: formData,
+          headers: {
+              "X-CSRF-TOKEN": "{{csrf_token()}}"
+          }
       })
-    }
+      .then(response => response.json())
+      .then(resp => {
+          if (resp.status == true) {
+            Swal.fire(
+              'Good job!',
+              'Expense Created!',
+              'success'
+            )
+            setInterval(() => {
+              location.reload(true)
+            }, 1000);
+          }else{
+              if (resp.data) {
+                  var error = Object.entries(resp.data);
+                  hideValidation()
+                  error.forEach((key,value) => {
+                      document.getElementById(key[0]+'_create_validation').style.display = 'block';
+                      document.getElementById(key[0]+'_create_validation').textContent = key[1];
+                  });
+              }
+          }
+      })
 
-    let edit = document.getElementById('edit');
+  })
+  
+  function editModal(id){
+    var myModal = new bootstrap.Modal(document.getElementById("editModal"), {});
+    
+    fetch("{{url('expenses')}}/"+id)
+    .then(response => response.json())
+    .then(function (resp) {
+      if (resp.status == true) {
 
-    edit.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        let id = edit.id_edit.value ?? '';
-        let category_id = edit.category_id.value ?? '';
-        let description = edit.description.value ?? '';
-        let item = edit.item.value ?? '';
-        let price = edit.price.value ?? '';
-        let quantity = edit.quantity.value ?? '';
-        let amount = edit.amount.value ?? '';
+          document.getElementById('id_edit').value = id;
+          document.getElementById('description_edit').value = resp.data.description;
+          document.getElementById('item_edit').value = resp.data.item;
+          document.getElementById('price_edit').value = resp.data.price;
+          document.getElementById('quantity_edit').value = resp.data.quantity;
+          document.getElementById('amount_edit').value = resp.data.amount;
+          console.log(resp.data.categoriesSelected);
 
-        let formData = new FormData();
-        formData.append('id', id);
-        formData.append('category_id', category_id);
-        formData.append('description', description);
-        formData.append('item', item);
-        formData.append('price', price);
-        formData.append('quantity', quantity);
-        formData.append('amount', amount);
+          //
+          $('#category_id_edit').val(resp.data.categoriesSelected).trigger('change');
 
-        fetch("{{route('expenses.update')}}", {
-            method: "POST",
-            body: formData,
-            headers: {
-                "X-CSRF-TOKEN": "{{csrf_token()}}"
-            }
-        })
-        .then(response => response.json())
-        .then(resp => {
+          myModal.show();
+      } 
+    })
+  }
+
+  let edit = document.getElementById('edit');
+
+  edit.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      var categoryOptions = $('#category_id_edit').select2('data');
+      var categoryValues = [];
+      for (var i = 0; i < categoryOptions.length; i++) {
+        categoryValues.push(categoryOptions[i].id);
+      }
+      
+      let id = edit.id_edit.value ?? '';
+      let description = edit.description.value ?? '';
+      let item = edit.item.value ?? '';
+      let price = edit.price.value ?? '';
+      let quantity = edit.quantity.value ?? '';
+      let amount = edit.amount.value ?? '';
+
+      let formData = new FormData();
+      formData.append('id', id);
+      formData.append('category_id', categoryValues);
+      formData.append('description', description);
+      formData.append('item', item);
+      formData.append('price', price);
+      formData.append('quantity', quantity);
+      formData.append('amount', amount);
+
+      fetch("{{route('expenses.update')}}", {
+          method: "POST",
+          body: formData,
+          headers: {
+              "X-CSRF-TOKEN": "{{csrf_token()}}"
+          }
+      })
+      .then(response => response.json())
+      .then(resp => {
+          if (resp.status == true) {
+            Swal.fire(
+              'Good job!',
+              'Expense Edited!',
+              'success'
+            )
+            setInterval(() => {
+              location.reload(true)
+            }, 1000);
+          }else{
+              if (resp.data) {
+                  var error = Object.entries(resp.data);
+                  hideValidation()
+                  error.forEach((key,value) => {
+                      document.getElementById(key[0]+'_create_validation').style.display = 'block';
+                      document.getElementById(key[0]+'_create_validation').textContent = key[1];
+                  });
+              }
+          }
+      })
+
+  })
+
+  function destroy(id){
+    Swal.fire({
+        icon: 'info',
+        title: 'Are you sure to delete this Expense?',
+        showCancelButton: true,
+        confirmButtonColor: '#fc4b6c',
+        confirmButtonText: 'Delete',
+    }).then((result) => {
+        if (result.isConfirmed) {
+          fetch("{{url('expenses')}}/"+id+"/delete")
+          .then(response => response.json())
+          .then(function (resp) {
             if (resp.status == true) {
               Swal.fire(
                 'Good job!',
-                'Category Edited!',
+                'Expense Deleted!',
                 'success'
               )
               setInterval(() => {
                 location.reload(true)
               }, 1000);
-            }else{
-                if (resp.data) {
-                    var error = Object.entries(resp.data);
-                    hideValidation()
-                    error.forEach((key,value) => {
-                        document.getElementById(key[0]+'_create_validation').style.display = 'block';
-                        document.getElementById(key[0]+'_create_validation').textContent = key[1];
-                    });
-                }
-            }
-        })
-
+            } 
+          })
+        }
     })
+  }
 
-    function destroy(id){
-      Swal.fire({
-                icon: 'info',
-                title: 'Are you sure to delete this Category?',
-                showCancelButton: true,
-                confirmButtonColor: '#fc4b6c',
-                confirmButtonText: 'Delete',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                  fetch("{{url('expenses/categories')}}/"+id+"/delete")
-                  .then(response => response.json())
-                  .then(function (resp) {
-                    if (resp.status == true) {
-                      Swal.fire(
-                        'Good job!',
-                        'Category Deleted!',
-                        'success'
-                      )
-                      setInterval(() => {
-                        location.reload(true)
-                      }, 1000);
-                    } 
-                  })
-                }
-            })
-    }
+  const quantityInputCreate = document.getElementById('quantity_create');
+  const priceInputCreate = document.getElementById('price_create');
+  const amountInputCreate = document.getElementById('amount_create');
 
-    const quantityInputCreate = document.getElementById('quantity_create');
-    const priceInputCreate = document.getElementById('price_create');
-    const amountInputCreate = document.getElementById('amount_create');
+  function calculateAmountCreate() {
+    const quantity = quantityInputCreate.value;
+    const price = priceInputCreate.value;
+    const amount = quantity * price;
+    amountInputCreate.value = amount.toFixed(2);
+  }
 
-    function calculateAmountCreate() {
-      const quantity = quantityInputCreate.value;
-      const price = priceInputCreate.value;
-      const amount = quantity * price;
-      amountInputCreate.value = amount.toFixed(2);
-    }
+  quantityInputCreate.addEventListener('keyup', calculateAmountCreate);
+  priceInputCreate.addEventListener('keyup', calculateAmountCreate);
 
-    quantityInputCreate.addEventListener('keyup', calculateAmountCreate);
-    priceInputCreate.addEventListener('keyup', calculateAmountCreate);
+  const quantityInputEdit = document.getElementById('quantity_edit');
+  const priceInputEdit = document.getElementById('price_edit');
+  const amountInputEdit = document.getElementById('amount_edit');
 
-    const quantityInputEdit = document.getElementById('quantity_edit');
-    const priceInputEdit = document.getElementById('price_edit');
-    const amountInputEdit = document.getElementById('amount_edit');
+  function calculateAmountEdit() {
+    const quantity = quantityInputEdit.value;
+    const price = priceInputEdit.value;
+    const amount = quantity * price;
+    amountInputEdit.value = amount.toFixed(2);
+  }
 
-    function calculateAmountEdit() {
-      const quantity = quantityInputEdit.value;
-      const price = priceInputEdit.value;
-      const amount = quantity * price;
-      amountInputEdit.value = amount.toFixed(2);
-    }
+  quantityInputEdit.addEventListener('keyup', calculateAmountEdit);
+  priceInputEdit.addEventListener('keyup', calculateAmountEdit);
 
-    quantityInputEdit.addEventListener('keyup', calculateAmountEdit);
-    priceInputEdit.addEventListener('keyup', calculateAmountEdit);
+  $(document).ready(function() {
+      $('.select2').select2({
+        width: '100%'
+      });
+  });
 
-
-  </script>
+</script>
 @endsection

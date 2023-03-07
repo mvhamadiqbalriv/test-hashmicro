@@ -15,7 +15,6 @@ return new class extends Migration
     {
         Schema::create('expenses', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('category_id');
             $table->string('item');
             $table->integer('price');
             $table->integer('quantity');
