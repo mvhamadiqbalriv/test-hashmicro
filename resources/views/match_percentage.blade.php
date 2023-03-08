@@ -28,8 +28,8 @@
                         <div class="form-group">
                             <label for="">Type</label>
                             <select name="type" class="form-select" id="">
-                                <option value="1">With Case</option>
-                                <option value="2">Ignore Case</option>
+                                <option value="1">Ignore Case</option>
+                                <option value="2">With Case</option>
                             </select>
                             <small class="text-danger" id="input_2_validation"></small>
                         </div>

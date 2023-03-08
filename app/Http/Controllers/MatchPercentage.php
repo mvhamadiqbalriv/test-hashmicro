@@ -26,7 +26,7 @@ class MatchPercentage extends Controller
             ], 400);
         }
         
-        if($request->type == '2'){
+        if($request->type == '1'){
             $input1 = strtolower($request->input_1);
             $input2 = strtolower($request->input_2);
         }else{

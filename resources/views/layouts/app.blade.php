@@ -43,7 +43,7 @@
             <span class="nav-link-text ms-1">Home</span>
           </a>
         </li>
-        <li class="nav-item {{ Request::routeIs('expenses.*') ? 'active' : '' }}">
+        <li class="nav-item">
           <a data-bs-toggle="collapse" href="#Expenses" class="nav-link " aria-controls="Expenses" role="button" aria-expanded="false">
             <div class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
             <i class="ni ni-app text-primary text-sm opacity-10"></i>
@@ -52,14 +52,14 @@
           </a>
           <div class="collapse " id="Expenses">
           <ul class="nav ms-4">
-            <li class="nav-item {{ Request::routeIs('expenses.categories.*') ? 'active' : '' }}">
-              <a class="nav-link " href="{{route('expenses.categories.index')}}">
+            <li class="nav-item">
+              <a class="nav-link {{ Request::routeIs('expenses.categories.*') ? 'active' : '' }}" href="{{route('expenses.categories.index')}}">
                 <span class="sidenav-mini-icon"> C </span>
                 <span class="sidenav-normal"> Category </span>
               </a>
             </li>
-            <li class="nav-item {{ Request::routeIs('expenses.*') ? 'active' : '' }}">
-              <a class="nav-link " href="{{route('expenses.index')}}">
+            <li class="nav-item">
+              <a class="nav-link {{ Request::routeIs('expenses.*') ? 'active' : '' }}" href="{{route('expenses.index')}}">
                 <span class="sidenav-mini-icon"> L </span>
                 <span class="sidenav-normal"> List </span>
               </a>

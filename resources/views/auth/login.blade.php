@@ -41,7 +41,7 @@
                           <form role="form" form method="POST" action="{{ route('login') }}">
                             @csrf
                             <div class="mb-3">
-                              <input type="email" name="email" class="form-control @error('email') is-invalid @enderror form-control-lg" placeholder="Email" aria-label="Email">
+                              <input type="email" name="email" value="{{old('email')}}" class="form-control @error('email') is-invalid @enderror form-control-lg" placeholder="Email" aria-label="Email">
                               @error('email')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -67,8 +67,7 @@
                       <div class="position-relative bg-gradient-primary h-100 m-3 px-7 border-radius-lg d-flex flex-column justify-content-center overflow-hidden" style="background-image: url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/signin-ill.jpg');
                   background-size: cover;">
                         <span class="mask bg-gradient-primary opacity-6"></span>
-                        <h4 class="mt-5 text-white font-weight-bolder position-relative">"Attention is the new currency"</h4>
-                        <p class="text-white position-relative">The more effortless the writing looks, the more effort the writer actually put into the process.</p>
+                        <h4 class="mt-5 text-white font-weight-bolder position-relative">"#HashMicro!"</h4>
                       </div>
                     </div>
                   </div>
