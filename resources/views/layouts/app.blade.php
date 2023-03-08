@@ -53,13 +53,13 @@
           <div class="collapse " id="Expenses">
           <ul class="nav ms-4">
             <li class="nav-item">
-              <a class="nav-link {{ Request::routeIs('expenses.categories.*') ? 'active' : '' }}" href="{{route('expenses.categories.index')}}">
+              <a class="nav-link {{ Request::routeIs('expenses.categories.index') ? 'active' : '' }}" href="{{route('expenses.categories.index')}}">
                 <span class="sidenav-mini-icon"> C </span>
                 <span class="sidenav-normal"> Category </span>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link {{ Request::routeIs('expenses.*') ? 'active' : '' }}" href="{{route('expenses.index')}}">
+              <a class="nav-link {{ Request::routeIs('expenses.index') ? 'active' : '' }}" href="{{route('expenses.index')}}">
                 <span class="sidenav-mini-icon"> L </span>
                 <span class="sidenav-normal"> List </span>
               </a>
