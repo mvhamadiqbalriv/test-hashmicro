@@ -231,8 +231,8 @@
                     var error = Object.entries(resp.data);
                     hideValidation()
                     error.forEach((key,value) => {
-                        document.getElementById(key[0]+'_create_validation').style.display = 'block';
-                        document.getElementById(key[0]+'_create_validation').textContent = key[1];
+                        document.getElementById(key[0]+'_edit_validation').style.display = 'block';
+                        document.getElementById(key[0]+'_edit_validation').textContent = key[1];
                     });
                 }
             }
