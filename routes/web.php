@@ -21,31 +21,34 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
-Route::prefix('match-percentage')->group(function() {
-    Route::name('match-percentage.')->group(function() {
-        Route::get('/', [MatchPercentage::class, 'index'])->name('index');
-        Route::post('/calculate', [MatchPercentage::class, 'calculate'])->name('calculate');
-    });
-});
-
-Route::prefix('expenses')->group(function() {
-    Route::name('expenses.')->group(function() {
-        Route::prefix('categories')->group(function() {
-            Route::name('categories.')->group(function() {
-                Route::get('/', [ExpenseController::class, 'categoriesIndex'])->name('index');
-                Route::post('/', [ExpenseController::class, 'categoriesStore'])->name('store');
-                Route::get('/{id}', [ExpenseController::class, 'categoriesDetail'])->name('detail');
-                Route::post('/update', [ExpenseController::class, 'categoriesUpdate'])->name('update');
-                Route::get('/{id}/delete', [ExpenseController::class, 'categoriesDelete'])->name('delete');
-            });
+Route::group(['middleware' => 'auth'], function () {
+    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    
+    Route::prefix('match-percentage')->group(function() {
+        Route::name('match-percentage.')->group(function() {
+            Route::get('/', [MatchPercentage::class, 'index'])->name('index');
+            Route::post('/calculate', [MatchPercentage::class, 'calculate'])->name('calculate');
         });
-        Route::get('/', [ExpenseController::class, 'index'])->name('index');
-        Route::post('/', [ExpenseController::class, 'store'])->name('store');
-        Route::get('/{id}', [ExpenseController::class, 'detail'])->name('detail');
-        Route::post('/update', [ExpenseController::class, 'update'])->name('update');
-        Route::get('/{id}/delete', [ExpenseController::class, 'delete'])->name('delete');
+    });
+    
+    Route::prefix('expenses')->group(function() {
+        Route::name('expenses.')->group(function() {
+            Route::prefix('categories')->group(function() {
+                Route::name('categories.')->group(function() {
+                    Route::get('/', [ExpenseController::class, 'categoriesIndex'])->name('index');
+                    Route::post('/', [ExpenseController::class, 'categoriesStore'])->name('store');
+                    Route::get('/{id}', [ExpenseController::class, 'categoriesDetail'])->name('detail');
+                    Route::post('/update', [ExpenseController::class, 'categoriesUpdate'])->name('update');
+                    Route::get('/{id}/delete', [ExpenseController::class, 'categoriesDelete'])->name('delete');
+                });
+            });
+            Route::get('/', [ExpenseController::class, 'index'])->name('index');
+            Route::post('/', [ExpenseController::class, 'store'])->name('store');
+            Route::get('/{id}', [ExpenseController::class, 'detail'])->name('detail');
+            Route::post('/update', [ExpenseController::class, 'update'])->name('update');
+            Route::get('/{id}/delete', [ExpenseController::class, 'delete'])->name('delete');
+        });
     });
 });
+
 
